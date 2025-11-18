@@ -69,7 +69,7 @@ bool APCGameModeBase::IsGuessNumberString(const FString& InNumberString)
 		TSet<TCHAR> UniqueDigits;
 		for (TCHAR C : InNumberString)
 		{
-			if (FChar::IsDigit(C) == false || C == '0')
+			if (FChar::IsDigit(C) == false || C == '0' || UniqueDigits.Contains(C) == true)
 			{
 				bIsUnique = false;
 				break;
