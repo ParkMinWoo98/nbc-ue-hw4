@@ -10,24 +10,47 @@ UCLASS()
 class PMWCHAT_API APCGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
-	
+
 public:
 	virtual void OnPostLogin(AController* NewPlayer) override;
 	virtual void BeginPlay() override;
 
-	FString GenerateSecretNumber();
+	void ReadyToPlay(APCPlayerController* PlayerController);
+	void CheckCanStartGame();
+
+	void GenerateSecretNumber();
 	bool IsGuessNumberString(const FString& InNumberString);
 	FString JudgeResult(const FString& InScretNumberString, const FString& InGuessNumberString);
 	void PrintChatMessageString(APCPlayerController* InChattingPlayerController, const FString& InChatMessageString);
+	void PrintChatInGame(APCPlayerController* InChattingPlayerController, const FString& InChatMessageString);
 	bool CheckGuessChance(APCPlayerController* InChattingPlayerController);
 	void IncreaseGuessCount(APCPlayerController* InChattingPlayerController);
-	void ResetGame();
+	void StartGame();
 	void JudgeGame(APCPlayerController* InChattingPlayerController, int InStrikeCount);
+	void EndGame();
+	void ResetGame();
+
+	void SetTurn(int32 PlayerIdx);
+	void PassTurnToNext();
+	void TurnTimeOut();
 
 protected:
 	UPROPERTY(EditAnywhere)
 	int32 SecretNumberLen = 3;
 	FString SecretNumberString;
 
-	TArray<TObjectPtr<APCPlayerController>> AllPlayerControllers;
+	bool bIsInGame = false;
+
+	UPROPERTY(EditAnywhere)
+	float TurnDuration = 10.0f;
+	int32 CurrPlayerIdx = -1;
+
+	FTimerHandle TurnTimerHandle;
+	FTimerHandle EndGameTimerHandle;
+
+	UPROPERTY(EditAnywhere)
+	int32 NeedPlayerCountToStart = 4;
+
+	TArray<TObjectPtr<APCPlayerController>> ReadyPlayerControllers;
+	TArray<TObjectPtr<APCPlayerController>> InGamePlayerControllers;
 };

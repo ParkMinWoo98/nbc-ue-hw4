@@ -13,6 +13,7 @@ public:
 	APCPlayerState();
 
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
+	FString GetPlayerName() const { return PlayerNameString; }
 	FString GetPlayerInfoString() const;
 
 public:

@@ -8,7 +8,7 @@ UCLASS()
 class PMWCHAT_API APCGameStateBase : public AGameStateBase
 {
 	GENERATED_BODY()
-	
+
 public:
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastRPCBroadcastLoginMessage(const FString& InNameString = FString(TEXT("XXXXXX")));

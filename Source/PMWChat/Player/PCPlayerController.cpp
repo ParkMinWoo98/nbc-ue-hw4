@@ -7,6 +7,7 @@
 #include "Game/PCGameModeBase.h"
 #include "Player/PCPlayerState.h"
 #include "Net/UnrealNetwork.h"
+#include "UI/UIPlayerTurn.h"
 
 APCPlayerController::APCPlayerController()
 {
@@ -39,6 +40,17 @@ void APCPlayerController::BeginPlay()
 			NotificationTextWidgetInstance->AddToViewport();
 		}
 	}
+
+	if (IsValid(UIPlayerTurnClass) == true)
+	{
+		UIPlayerTurnInstance = CreateWidget<UUIPlayerTurn>(this, UIPlayerTurnClass);
+		if (IsValid(UIPlayerTurnInstance) == true)
+		{
+			UIPlayerTurnInstance->AddToViewport();
+		}
+	}
+
+	ServerRPCReadyToPlay();
 }
 
 void APCPlayerController::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
@@ -67,6 +79,22 @@ void APCPlayerController::PrintChatMessageString(const FString& InChatMessageStr
 	PMWChatFunctionLibrary::MyPrintString(this, InChatMessageString, 10.0f);
 }
 
+void APCPlayerController::ClientRPCSetPlayerTurn_Implementation(const FString& NameString, float Timer)
+{
+	if (IsValid(UIPlayerTurnInstance) == true)
+	{
+		UIPlayerTurnInstance->SetInfo(NameString, Timer);
+	}
+}
+
+void APCPlayerController::ClientRPCEndGame_Implementation()
+{
+	if (IsValid(UIPlayerTurnInstance) == true)
+	{
+		UIPlayerTurnInstance->ClearInfo();
+	}
+}
+
 void APCPlayerController::ClientRPCPrintChatMessageString_Implementation(const FString& InChatMessageString)
 {
 	PrintChatMessageString(InChatMessageString);
@@ -78,5 +106,14 @@ void APCPlayerController::ServerRPCPrintChatMessageString_Implementation(const F
 	if (IsValid(GM) == true)
 	{
 		GM->PrintChatMessageString(this, InChatMessageString);
+	}
+}
+
+void APCPlayerController::ServerRPCReadyToPlay_Implementation()
+{
+	APCGameModeBase* GM = Cast<APCGameModeBase>(UGameplayStatics::GetGameMode(this));
+	if (IsValid(GM) == true)
+	{
+		GM->ReadyToPlay(this);
 	}
 }
